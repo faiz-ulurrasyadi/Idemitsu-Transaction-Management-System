@@ -1,0 +1,17 @@
+.products-component{
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.filter-box{
+    background-color: lightgray;
+}
+
+.products-container{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    background-color: lightgray;
+}
