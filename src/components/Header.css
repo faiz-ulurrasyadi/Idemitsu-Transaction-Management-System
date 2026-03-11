@@ -1,8 +1,8 @@
 .home-header{
     display: grid;
-    grid-template-columns: 2fr 4fr 1fr;
+    grid-template-columns: 2fr 4fr 1fr 1fr;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
 }
 
 .company-logo{
@@ -14,7 +14,18 @@
     height: 35px;
 }
 
-.nav-carts{
-    font-size: 28px;
+.search-btn{
+    height: 35px;
+    width: 80px;
+}
+
+.nav-bar{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.nav-carts, .nav-my-page{
+    width: 28px;
+    height: 28px;
     text-align: center;
 }
