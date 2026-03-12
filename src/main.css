@@ -3,7 +3,9 @@
 }
 
 body{
-    width: 100%;
+    width: 60%;
+    min-width: 820px;
+    margin: 20px auto;
     background-color: white
 }
 

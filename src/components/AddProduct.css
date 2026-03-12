@@ -1,0 +1,14 @@
+.add-product-container{
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    padding: 5px;
+    gap: 5px;
+}
+
+.add-product-container input[type="text"], input[type="number"], textarea{
+    width: 300px;
+}
+
+.vec-type-choices label, .transmission-type-choices label, .oil-type-choices label{
+    margin-right: 20px;
+}

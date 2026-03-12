@@ -10,7 +10,9 @@ function Header({ setSearch }) {
 
     return (
         <header className="home-header">
-            <img className="company-logo" src={logo} alt="Idemitsu logo" />
+            <NavLink to="/">
+                <img className="company-logo" src={logo} alt="Idemitsu logo" />
+            </NavLink>
             <input 
                 type="text" 
                 className="search-box" 

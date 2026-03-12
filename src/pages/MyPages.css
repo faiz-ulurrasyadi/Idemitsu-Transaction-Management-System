@@ -1,0 +1,43 @@
+.myPages-container{
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.myPages-nav{
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+.myPages-nav h2{
+    margin: 20px 2px;
+    padding-left: 5px;
+}
+
+.myPages-nav .nav-link{
+    text-decoration: none;
+    background-color: darkgrey;
+    height: 30px;
+    margin: 2px 2px;
+    display: flex;
+    align-items: center;
+    color: black;
+    padding-left: 5px;
+    font-weight: bold;
+}
+
+.myPages-content{
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+.myPages-nav .nav-link:hover{
+    background-color: rgb(94, 94, 94);
+    color: white;
+}
+
+.myPages-nav .nav-link.active{
+    background-color: rgb(94, 94, 94);
+    color: white;
+}

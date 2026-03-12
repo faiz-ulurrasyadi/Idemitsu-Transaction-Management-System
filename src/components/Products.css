@@ -1,17 +1,50 @@
 .products-component{
     display: grid;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: 1fr 4fr;
     margin-top: 20px;
     gap: 10px;
 }
 
 .filter-box{
-    background-color: lightgray;
+    border: 2px solid grey;
+    border-radius: 5px;
+    padding: 0px 10px;
+}
+
+.filter-box p{
+    font-weight: bold;
+    background-color:darkgray;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    padding-left: 5px;
 }
 
 .products-container{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
-    background-color: lightgray;
+    border: 2px solid grey;
+    border-radius: 5px;
+    padding-left: 10px;
+}
+
+.price-range-input-container{
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    gap: 5px;
+}
+.filter-btn{
+    width: 80%;
+    height: 40px;
+    margin: 10px auto;
+}
+
+@media (max-width: 400px){
+    .products-component{
+        grid-template-columns: 1fr;
+    }
+    .filter-box{
+        display: none;
+    }
 }
