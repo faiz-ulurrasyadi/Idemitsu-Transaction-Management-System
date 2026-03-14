@@ -3,7 +3,7 @@ import logo from '../assets/compLogoPc.png'
 import cart from '../assets/shopping-cart.png'
 import my_page from '../assets/my-page.png'
 import { NavLink } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function Header({ setSearch }) {
     const [searchResult, setSearchResult] = useState("")

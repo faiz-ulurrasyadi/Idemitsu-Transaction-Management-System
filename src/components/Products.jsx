@@ -1,8 +1,10 @@
 import './Products.css'
 import { useState, useEffect } from 'react'
 import CurrencyInput from 'react-currency-input-field'
+import { supabase } from '../services/supabase-client'
+import { productsImgData } from '../assets/productsImg'
 
-function Products({ search }) {
+function Products({ search, getCartList }) {
     const [filter, setFilter] = useState({
         vecType: "all",
         transmission: "all",
@@ -10,6 +12,22 @@ function Products({ search }) {
         minPrice: 0,
         maxPrice: 0,
     })
+    const arr = ["fff", "awe", "dafh"]
+
+    const [products, setProducts] = useState([])
+
+    const fetchData = async () => {
+        const { error, data } = await supabase.from('products_oil').select('*').order('id', {ascending: true})
+        setProducts(data)
+        getCartList(arr)
+    }
+    const showInRupiah = (amount) => {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount)
+    }
+
+    useEffect(() => {
+        fetchData()
+    }, [])
 
     return (
         <div className="products-component">
@@ -117,8 +135,22 @@ function Products({ search }) {
                 <button className="filter-btn">Apply filter</button>
             </div>
             <div className="products-container">
-                <h2>Products box</h2>
-                <p>Search result: {search}</p>
+                {products.map((product, idx) => (
+                    <>
+                        <div className="product-card" key={product.product_id}>
+                            <img className="product-img" src={productsImgData[product.product_id]} />
+                            <p>{product.name}</p>
+                            <p>{showInRupiah(product.price)}</p>
+                            <div className="product-overlay">
+                                <p className="product-dec">{product.dec}</p>
+                                <div className="product-btn">
+                                    <button className="addToCart-btn">Add to cart</button>
+                                    <button className="detailProduct-btn">More details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                ))}
             </div>
         </div>
     )
