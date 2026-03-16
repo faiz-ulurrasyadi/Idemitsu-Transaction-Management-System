@@ -12,7 +12,6 @@ function Products({ search, getCartList }) {
         minPrice: 0,
         maxPrice: 0,
     })
-
     const [products, setProducts] = useState([])
     const [addedModalId, setAddedModalId] = useState("")
 
@@ -48,7 +47,8 @@ function Products({ search, getCartList }) {
         setProducts(data)
     }
     const showInRupiah = (amount) => {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount)
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0,
+    maximumFractionDigits: 0, }).format(amount)
     }
 
     useEffect(() => {

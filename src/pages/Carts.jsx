@@ -9,16 +9,20 @@ function Carts({ cartLists, setCartLists }) {
     const carts = []
     const [detailedCartLists, setDetailedCartLists] = useState([])
     const [totalCart, setTotalCart] = useState({amount: 0, item: 0})
+    const [deleteId, setDeleteId] = useState(null)
+    const [levelTotal, setLevelTotal] = useState(0)
 
     const showInRupiah = (amount) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0,
     maximumFractionDigits: 0, }).format(amount)
     }
-    
-    const isDiscount = () => {
-
+    const bonusHandle = (qty) => {
+        if (qty<24 && 24-qty<=5){
+            return `Add ${24-qty} more to get discount!!`
+        } else if (qty>24 && qty%24>=19){
+            return `Add ${24-(qty%24)} more to get discount!!`
+        }
     }
-
     const changeQtyHandler = (list, type) => {
         if (type === "dec"){
             if (list.quantity >= 2){
@@ -40,7 +44,6 @@ function Carts({ cartLists, setCartLists }) {
             ))
         }
     }
-
     const calcTotal = () => {
         let total = 0
         let totalItem = 0
@@ -51,15 +54,27 @@ function Carts({ cartLists, setCartLists }) {
         })
         setTotalCart({amount: total, item: totalItem})
     }
+    const deleteCart = async (id) => {
+        setCartLists((prev) => prev.filter(item => item.product_id!==id))
+        setDeleteId(null)
+    }
+    const levelhandle = () => {
+        let level = 0
+        cartLists.forEach(list => {
+            level = level + parseInt(list.quantity/24)
+        })
+        setLevelTotal(level)
+    }
 
     useEffect(() => {
         calcTotal()
+        levelhandle()
     }, [cartLists])
 
     return (
         <div className="cart-pages">
             <h1>
-                Your shopping carts({totalCart.item})
+                Your carts({totalCart.item})
             </h1>
             <div className="cart-container">
                 <div className="items-container">
@@ -98,22 +113,33 @@ function Carts({ cartLists, setCartLists }) {
                                     >+</button>
                                 </div>
                             </div>
-                            <button className="delete-item-btn">🗑</button>
+                            <button 
+                                className="delete-item-btn"
+                                onClick={() => setDeleteId(list.product_id)}
+                            >🗑</button>
                         </div>
                         <div className="item-total">
-                            {24-list.quantity<=5 && (<p className="item-bonus-modal">Add more to get discount!!</p>)}
+                            <p className="item-bonus-modal">{bonusHandle(list.quantity)}</p>
                             <p>{showInRupiah(parseInt(list.price) * parseInt(list.quantity))}</p>
+                        </div>
+                        <div className="delete-modal" style={{display: deleteId === list.product_id? "block":"none"}}>
+                            <p style={{marginTop: "0px"}}>Are you sure you want to remove this from cart?</p>
+                            <div className="delete-btn-box">
+                                <button className="yes-delete" onClick={() => deleteCart(list.product_id)}>yes</button>
+                                <button className="no-delete" onClick={() => setDeleteId(null)}>no</button>
+                            </div>
                         </div>
                     </div>))}
                 </div>
                 <div className="checkout-container">
                     <p>Total amount: {showInRupiah(totalCart.amount)}</p>
+                    <p>Bonus level: {levelTotal}</p>
                     <button type="submit" className="checkout-btn">Checkout</button>
                 </div>
             </div>
             <button onClick={() => {
                 setCartLists([])
-            }}>reset cart</button>
+            }}>Clear cart</button>
         </div>
     )
 }
