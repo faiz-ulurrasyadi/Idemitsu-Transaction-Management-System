@@ -29,3 +29,22 @@
     height: 28px;
     text-align: center;
 }
+
+.carts-nav-box{
+    position: relative;
+}
+
+.cart-icon-total{
+    position: absolute;
+    bottom: 0;
+    right: 5px;
+    background-color: red;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    border-radius: 50%;
+}

@@ -84,6 +84,23 @@
     border-radius: 5px;
     margin: 4px 4px;
 }
+.addToCart-btn:active{
+    background-color: cornflowerblue;
+}
+.addToCart-btn:hover{
+    background-color: blue;
+    cursor: pointer;
+}
+.added-modal{
+    position: absolute;
+    height: 30px;
+    left: 0;
+    right: 0;
+    bottom: 50%;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(0, 255, 13);
+}
 .detailProduct-btn{
     height: 30px;
     background-color:rgba(9, 255, 0, 0.658);

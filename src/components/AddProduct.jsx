@@ -133,7 +133,7 @@ function AddProduct(){
                     groupSeparator="."
                     decimalSeparator=","
                     onValueChange={(e) => setProductData({...productData, price: e})}
-                />
+                />  
                 <label htmlFor="dec">Description:</label>
                 <textarea 
                     id="dec" 

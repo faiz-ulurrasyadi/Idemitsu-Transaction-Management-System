@@ -12,14 +12,40 @@ function Products({ search, getCartList }) {
         minPrice: 0,
         maxPrice: 0,
     })
-    const arr = ["fff", "awe", "dafh"]
 
     const [products, setProducts] = useState([])
+    const [addedModalId, setAddedModalId] = useState("")
 
     const fetchData = async () => {
-        const { error, data } = await supabase.from('products_oil').select('*').order('id', {ascending: true})
+        // const { error, data } = await supabase.from('products_oil').select('*').order('id', {ascending: true})
+        
+        let query = supabase
+        .from("products_oil")
+        .select("*")
+
+        if (filter.oilGrade !== 'all') {
+        query = query.eq("quality", filter.oilGrade)
+        }
+        if (filter.vecType !== 'all') {
+        query = query.eq("vec_type", filter.vecType)
+        }
+        if (filter.transmission !== 'all') {
+        query = query.eq("transmission", filter.transmission)
+        }
+        if (filter.minPrice) {
+        query = query.gte("price", filter.minPrice)
+        }
+        if (filter.maxPrice) {
+        query = query.lte("price", filter.maxPrice)
+        }
+        if (search.length!==0){
+            search.forEach(word => {
+                query = query.ilike("dec", `%${word}%`)
+            })
+        }
+
+        const { data, error } = await query
         setProducts(data)
-        getCartList(arr)
     }
     const showInRupiah = (amount) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount)
@@ -27,7 +53,7 @@ function Products({ search, getCartList }) {
 
     useEffect(() => {
         fetchData()
-    }, [])
+    }, [filter, search])
 
     return (
         <div className="products-component">
@@ -73,8 +99,8 @@ function Products({ search, getCartList }) {
                                 </label>
                             </li>
                             <li>
-                                <label htmlFor="automatic">
-                                    <input type="radio" id="automatic" name="transmission" value="automatic" onChange={() => setFilter({...filter, transmission: "automatic"})} checked={filter.transmission === "automatic"} />
+                                <label htmlFor="auto">
+                                    <input type="radio" id="auto" name="transmission" value="auto" onChange={() => setFilter({...filter, transmission: "auto"})} checked={filter.transmission === "auto"} />
                                     Automatic
                                 </label>
                             </li>
@@ -131,26 +157,40 @@ function Products({ search, getCartList }) {
                         </div>
                     </div>
                 </form>
-                <h2>result: {filter.vecType} {filter.transmission} {filter.oilGrade} {filter.minPrice}</h2>
-                <button className="filter-btn">Apply filter</button>
+                {/* <h2>result: {filter.vecType} {filter.transmission} {filter.oilGrade} {filter.minPrice}</h2>
+                <button className="filter-btn">Apply filter</button> */}
             </div>
             <div className="products-container">
-                {products.map((product, idx) => (
-                    <>
-                        <div className="product-card" key={product.product_id}>
-                            <img className="product-img" src={productsImgData[product.product_id]} />
-                            <p>{product.name}</p>
-                            <p>{showInRupiah(product.price)}</p>
-                            <div className="product-overlay">
-                                <p className="product-dec">{product.dec}</p>
-                                <div className="product-btn">
-                                    <button className="addToCart-btn">Add to cart</button>
-                                    <button className="detailProduct-btn">More details</button>
-                                </div>
+                {products.length!==0?products.map((product, idx) => (
+                    <div className="product-card" key={product.product_id}>
+                        <img className="product-img" src={productsImgData[product.product_id]} />
+                        <p>{product.name}</p>
+                        <p>{showInRupiah(product.price)}</p>
+                        <div className="product-overlay">
+                            <p className="product-dec">{product.dec}</p>
+                            <div className="product-btn">
+                                <button 
+                                    className="addToCart-btn"
+                                    onClick={() => {
+                                        getCartList({
+                                            prodId: product.product_id,
+                                            prodName: product.name,
+                                            prodPrice: product.price,
+                                        })
+                                        setAddedModalId(product.product_id)
+                                        setTimeout(() => setAddedModalId(""), 200)
+                                    }}
+                                >Add to cart</button>
+                                <button className="detailProduct-btn">More details</button>
                             </div>
                         </div>
-                    </>
-                ))}
+                        {addedModalId === product.product_id && (
+                            <div className="added-modal" style={{display: addedModalId? "flex": "none"}}>
+                                <p>Added</p>
+                            </div>
+                        )}
+                    </div>
+                )):<p>No such item</p>}
             </div>
         </div>
     )
