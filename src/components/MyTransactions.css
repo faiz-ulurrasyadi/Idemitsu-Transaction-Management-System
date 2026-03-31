@@ -1,0 +1,64 @@
+.transaction_container{
+    border: 1px solid gray;
+    padding: 10px;
+    margin: 15px auto;
+}
+
+.user{
+    margin-right: 5px;
+}
+
+.transaction_id{
+    color:rgb(94, 94, 94);
+}
+
+.transaction_content{
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+}
+
+.transaction_item{
+    display: grid;
+    grid-template-columns: 1fr 9fr;
+    margin: 10px 20px;
+}
+
+.total_amount{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.reward_container{
+    width: 100px;
+    margin-top: 20px;
+    padding: 5px;
+    background-color: aquamarine;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.paid{
+    background-color: rgba(144, 238, 172, 0.644);
+    color: green;
+    padding: 2px 10px;
+    margin: 0px 5px;
+}
+
+.failed{
+    background-color: rgba(255, 157, 154, 0.705);
+    color: red;
+    padding: 2px 10px;
+    margin: 0px 5px;
+}
+
+.pending, .partial{
+    background-color: rgba(255, 248, 154, 0.705);
+    color: darkorange;
+    padding: 2px 10px;
+    margin: 0px 5px;
+}
+
+.parMar{
+    margin: 2px;
+}

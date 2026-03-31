@@ -4,6 +4,7 @@ import { supabase } from "../services/supabase-client"
 import cart from '../assets/shopping-cart.png'
 import { productsImgData } from '../assets/productsImg'
 import './Carts.css'
+import TransactionForm from "../components/TransactionForm"
 
 function Carts({ cartLists, setCartLists }) {
     const carts = []
@@ -11,6 +12,18 @@ function Carts({ cartLists, setCartLists }) {
     const [totalCart, setTotalCart] = useState({amount: 0, item: 0})
     const [deleteId, setDeleteId] = useState(null)
     const [levelTotal, setLevelTotal] = useState(0)
+    const [transItems, setTransItems] = useState([])
+    const [transactions, setTransactions] = useState({
+        transaction_id: '',
+        user_id: '',
+        transaction_date: new Date(),
+        payment_type: 'full',
+        payment_method: 'cash',
+        status: 'pending', //pending, paid, partial, failed
+        total_amount: totalCart.amount,
+        level: levelTotal,
+        notes: '',
+    })
 
     const showInRupiah = (amount) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0,
@@ -64,6 +77,41 @@ function Carts({ cartLists, setCartLists }) {
             level = level + parseInt(list.quantity/24)
         })
         setLevelTotal(level)
+    }
+    const generateId = () => {
+        const now = new Date()
+        const ms = String(now.getMilliseconds()).padStart(3, '0')
+        const date = now.toISOString().slice(0,10).replace(/-/g, '')
+        const random = Math.floor(10000 + Math.random() * 90000)
+
+        return `IDM-${date}${ms}-${random}`
+    }
+    const insertToDatabase = async (data) => {
+        const { error } = await supabase.from('transaction_items_oil').insert(data).single()
+
+        if (error){
+            console.log(error)
+        }
+    }
+    const checkoutHandle = async () => {
+        const tempTrans_id = generateId()
+        const tempTransItems = cartLists.map(list => ({
+            transaction_id: tempTrans_id,
+            product_id: list.product_id,
+            product_name: list.product_name,
+            price: list.price,
+            quantity: list.quantity,
+            subtotal: list.price * list.quantity,
+        }))
+        const tempTransaction = {...transactions,
+            transaction_id: tempTrans_id,
+            total_amount: totalCart.amount,
+            level: levelTotal,
+        }
+        const { error } = await supabase.from('transactions_oil').insert(tempTransaction).single()
+        setTransactions(tempTransaction)
+        console.log(tempTransItems)
+        tempTransItems.forEach(item => insertToDatabase(item))
     }
 
     useEffect(() => {
@@ -134,7 +182,16 @@ function Carts({ cartLists, setCartLists }) {
                 <div className="checkout-container">
                     <p>Total amount: {showInRupiah(totalCart.amount)}</p>
                     <p>Bonus level: {levelTotal}</p>
-                    <button type="submit" className="checkout-btn">Checkout</button>
+                    <TransactionForm transactions={transactions} setTransactions={setTransactions}/>
+                    {/* {transItems.length!==0 && (
+                        transItems.map(item => (
+                            <div>
+                                <p>{item.transaction_id}</p>
+                                <p>{item.product_name}</p>
+                            </div>
+                        ))
+                    )} */}
+                    <button type="submit" className="checkout-btn" onClick={checkoutHandle}>Checkout</button>
                 </div>
             </div>
             <button onClick={() => {

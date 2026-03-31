@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import CurrencyInput from 'react-currency-input-field'
 import { supabase } from '../services/supabase-client'
 import { productsImgData } from '../assets/productsImg'
+import { userCart } from '../contexts/userContext'
 
 function Products({ search, getCartList }) {
     const [filter, setFilter] = useState({

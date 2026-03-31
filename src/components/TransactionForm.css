@@ -1,0 +1,5 @@
+.two_form_grid_container{
+    display: grid;
+    grid-template-columns: 2fr 0.5fr;
+    gap: 4px;
+}
