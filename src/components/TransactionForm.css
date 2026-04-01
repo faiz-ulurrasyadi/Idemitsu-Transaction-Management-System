@@ -3,3 +3,17 @@
     grid-template-columns: 2fr 0.5fr;
     gap: 4px;
 }
+.two_form_grid_container input, .two_form_grid_container select{
+    height: 27px;
+    width: 150px;
+}
+.total_installments_container{
+    margin-top: 4px;
+    display: grid;
+    grid-template-columns: 2fr 0.5fr;
+    gap: 4px;
+}
+.total_installments_container select{
+    height: 27px;
+    width: 150px;
+}

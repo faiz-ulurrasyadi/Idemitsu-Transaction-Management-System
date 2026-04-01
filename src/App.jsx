@@ -7,6 +7,7 @@ import { useState } from "react"
 import MyTransactions from "./components/MyTransactions.jsx"
 import Header from "./components/Header.jsx"
 import Products from "./components/Products.jsx"
+import TransactionDetail from "./components/TransactionDetail.jsx"
 
 function App() {
     const [cartLists, setCartLists] = useState([])
@@ -51,7 +52,10 @@ function App() {
                     <Route path="/my-pages" element={<MyPages cartLists={cartLists}/>}>
                         <Route path="add-product" element={<AddProduct />} />
                         <Route path="list-of-products" element={<ListProducts />} />
-                        <Route path="my-transactions" element={<MyTransactions />} />
+                        <Route path="my-transactions">
+                            <Route index element={<MyTransactions />} />
+                            <Route path=":transaction_id" element={<TransactionDetail />} />
+                        </Route>
                     </Route>
                 </Routes>
             </Router>

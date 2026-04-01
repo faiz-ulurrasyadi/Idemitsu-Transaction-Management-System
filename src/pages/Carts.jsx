@@ -23,7 +23,14 @@ function Carts({ cartLists, setCartLists }) {
         total_amount: totalCart.amount,
         level: levelTotal,
         notes: '',
+        total_installments: 3,
     })
+    const idType = {
+        "transaction": "IDM",
+        "installment": "INS",
+        "payment": "PAY",
+    }
+    let nextYear = false
 
     const showInRupiah = (amount) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0,
@@ -78,23 +85,25 @@ function Carts({ cartLists, setCartLists }) {
         })
         setLevelTotal(level)
     }
-    const generateId = () => {
+    const generateId = (type) => {
         const now = new Date()
         const ms = String(now.getMilliseconds()).padStart(3, '0')
         const date = now.toISOString().slice(0,10).replace(/-/g, '')
         const random = Math.floor(10000 + Math.random() * 90000)
+        const prefix = idType[type]
 
-        return `IDM-${date}${ms}-${random}`
+        return `${prefix}-${date}${ms}-${random}`
     }
-    const insertToDatabase = async (data) => {
-        const { error } = await supabase.from('transaction_items_oil').insert(data).single()
+    const insertToDatabase = async (data, name) => {
+        const { error } = await supabase.from(name).insert(data).single()
 
         if (error){
             console.log(error)
         }
     }
     const checkoutHandle = async () => {
-        const tempTrans_id = generateId()
+        const tempTrans_id = generateId("transaction")
+
         const tempTransItems = cartLists.map(list => ({
             transaction_id: tempTrans_id,
             product_id: list.product_id,
@@ -108,10 +117,58 @@ function Carts({ cartLists, setCartLists }) {
             total_amount: totalCart.amount,
             level: levelTotal,
         }
+
         const { error } = await supabase.from('transactions_oil').insert(tempTransaction).single()
         setTransactions(tempTransaction)
         console.log(tempTransItems)
-        tempTransItems.forEach(item => insertToDatabase(item))
+        tempTransItems.forEach(item => insertToDatabase(item, 'transaction_items_oil'))
+
+        if (transactions.payment_type === "installment"){
+            const tempInstallmentId = generateId("installment")
+            const tempInstallmentPlans = {
+                installment_id: tempInstallmentId,
+                transaction_id: tempTrans_id,
+                total_installments: transactions.total_installments,
+                installment_amount: parseInt(totalCart.amount/transactions.total_installments),
+                start_date: new Date(transactions.transaction_date),
+            }
+
+            let tempInstallmentPayments = []
+            const baseAmount = Math.floor(totalCart.amount / transactions.total_installments)
+            const remainder = totalCart.amount % transactions.total_installments
+            const installments = Array.from({ length: transactions.total_installments }, (_, i) => ({
+            amount: i === transactions.total_installments - 1
+                ? baseAmount + remainder
+                : baseAmount
+            }))
+
+            for (let i=1; i<=transactions.total_installments; i++){
+                tempInstallmentPayments.push({
+                    payment_id: generateId("payment"),
+                    installment_id: tempInstallmentId,
+                    payment_number: i,
+                    amount: installments[i-1].amount,
+                    due_date: new Date(
+                        transactions.transaction_date.toISOString().replace(/(\d{4})-(\d{2})(.*)/, function(_, year, month, rest){
+                            year = nextYear? (parseInt(year)+1).toString() : year
+                            month = ((parseInt(month) + i)%12).toString()
+                            if (month==="0"){
+                                month = "12"
+                                nextYear = true
+                            }
+                            return month.length===1?`${year}-0${month}${rest}`:`${year}-${month}${rest}`
+                        })
+                    ),
+                    paid_date: null,
+                    status: "pending",
+                    is_late: false,
+                    late_days: null,
+                })
+            }
+            const { error } = await supabase.from('installment_plans').insert(tempInstallmentPlans).single()
+            console.log(tempInstallmentPayments)
+            tempInstallmentPayments.forEach(payment => insertToDatabase(payment, 'installment_payments'))
+        }
     }
 
     useEffect(() => {

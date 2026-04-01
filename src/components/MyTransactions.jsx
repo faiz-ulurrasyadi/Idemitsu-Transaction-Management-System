@@ -2,6 +2,7 @@ import './MyTransactions.css'
 import { supabase } from '../services/supabase-client'
 import { useState, useEffect } from 'react'
 import { productsImgData } from '../assets/productsImg'
+import { NavLink } from 'react-router-dom'
 
 function MyTransactions(){
     const [transactionDatas, setTransactionDatas] = useState([])
@@ -54,7 +55,7 @@ function MyTransactions(){
                                         />
                                         <div>
                                             <p className='parMar'><strong>{item.product_name}</strong></p>
-                                            <p className='parMar'>{item.quantity} barang x {showInRupiah(item.price)}</p>
+                                            <p className='parMar item_price'>{item.quantity} barang x {showInRupiah(item.price)}</p>
                                         </div>
                                     </div>
                                     
@@ -69,6 +70,9 @@ function MyTransactions(){
                                     </div>
                                 )}
                             </div>
+                        </div>
+                        <div className="transaction_footer">
+                            <NavLink to={`/my-pages/my-transactions/${transaction.transaction_id}`} className="details_link">More Details</NavLink>
                         </div>
                     </div>
                 )

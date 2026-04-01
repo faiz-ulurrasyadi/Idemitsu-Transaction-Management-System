@@ -1,7 +1,11 @@
 .transaction_container{
-    border: 1px solid gray;
+    box-shadow: 5px 5px 5px 5px;
     padding: 10px;
     margin: 15px auto;
+    border-radius: 8px;
+    border-color: var(--NN200, #CFD5E1);
+    box-shadow: 0 1px 4px rgba(141, 150, 170, 0.4);
+    background-color: var(--NN0, #FFFFFF);
 }
 
 .user{
@@ -21,6 +25,11 @@
     display: grid;
     grid-template-columns: 1fr 9fr;
     margin: 10px 20px;
+}
+
+.item_price{
+    font-size: 14px;
+    color: rgb(94, 94, 94);
 }
 
 .total_amount{

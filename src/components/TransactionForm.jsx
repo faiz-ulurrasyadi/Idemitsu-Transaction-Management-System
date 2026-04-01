@@ -56,6 +56,21 @@ function TransactionForm({ transactions, setTransactions }){
                         <option value="failed" name="transaction_status">failed</option>
                     </select>
                 </div>
+                {transactions.payment_type === "installment" && (
+                    <div className='total_installments_container'>
+                        <label htmlFor="total_installments">Total installments:</label>
+                        <select
+                            id="total_installments"
+                            name="total_installments"
+                            value={transactions.total_installments}
+                            onChange={(e) => setTransactions({...transactions, total_installments: parseInt(e.target.value)})}
+                        >
+                            <option value="3" name="total_installments">3x</option>
+                            <option value="6" name="total_installments">6x</option>
+                            <option value="12" name="total_installments">12x</option>
+                        </select>
+                    </div>
+                    )}
                 <label htmlFor="transaction_notes">Notes:</label>
                 <textarea id="transaction_notes" rows="10" onChange={(e) => setTransactions({...transactions, notes: e.target.value})}></textarea>
             </form>

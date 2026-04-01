@@ -1,0 +1,76 @@
+*{
+    box-sizing: border-box;
+}
+
+.transaction_details_container{
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+}
+
+.details_container{
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;;
+}
+
+.right_side{
+    text-align: right;
+    font-weight: bold;
+}
+.left_side{
+    color: rgb(94, 94, 94);
+}
+
+.item_container{
+    display: grid;
+    grid-template-columns: 1.3fr 9fr 2fr;
+    margin: 10px 0px;
+}
+
+.payment_details{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+.installment_payments_btn{
+    width: 100%;
+    height: 40px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid grey;
+    background-color: white;
+    margin: 3px 0px;
+    border-radius: 7px;
+}
+
+.transaction_btn{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.btn{
+    width: 70%;
+    height: 40px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid grey;
+    background-color: white;
+    margin: 3px 0px;
+    border-radius: 7px;
+}
+.nav-link{
+    text-decoration: none;
+    background-color: darkgrey;
+    color: black;;
+}
+
+.parMar{
+    margin: 2px;
+}
