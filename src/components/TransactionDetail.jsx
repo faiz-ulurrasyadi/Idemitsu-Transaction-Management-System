@@ -3,32 +3,48 @@ import { useState, useEffect } from "react"
 import { supabase } from "../services/supabase-client"
 import { productsImgData } from '../assets/productsImg'
 import './TransactionDetail.css'
-
+import { useTransactionStore } from "../contexts/useTransactionStore"
+import InstallmentPayments from "./InstallmentPayments"
 
 const TransactionDetail = () => {
     const { transaction_id } = useParams()
-    const [transactionData, setTransactionData] = useState({})
-    const [transactionItems, setTransactionItems] = useState([])
+    // const [transactionData, setTransactionData] = useState({})
+    // const [transactionItems, setTransactionItems] = useState([])
     const transactionStatusMsg = {
         "paid": "Transaction successful",
         "pending": "Transaction is pending",
         "partial": "Transaction is on partial payment",
         "failed": "Transaction failed"
     }
-    const [viewPayments, setViewPayments] = useState(false)
+    const [viewPayments, setViewPayments] = useState(null)
     const [payments, setPayments] = useState([])
+    const { transactions, setTransactions, updateTransactions, addTransactions, removeTransactions,
+        transaction_items, addTransactionsItems,
+        installment_plans, updateInstallmentPlans, addInstallmentPlans,
+        installment_payments, updateInstallmentPayments, addInstallmentPayments,
+        isFetched } = useTransactionStore()
+    const transactionData = transactions.filter(transaction => 
+        transaction.transaction_id === transaction_id)[0]
+    const transactionItems = transaction_items.filter(item => 
+        item.transaction_id === transaction_id)
+    const installment_id = transactionData.payment_type === "installment" ? 
+        installment_plans.filter(plan => plan.transaction_id === transaction_id)[0].installment_id : 
+        null
+    const installmentPayments = installment_id ? 
+        installment_payments.filter(payment => payment.installment_id === installment_id) : 
+        null
 
     const fetchData = async () => {
         // const { data, error } = await supabase.from('installment_payments').select('*').eq())
     }
     const fetchDatas = async () => {
-        const [transRes, itemRes] = await Promise.all([
-            supabase.from('transactions_oil').select('*').eq('transaction_id', transaction_id).single(),
-            supabase.from('transaction_items_oil').select('*').eq('transaction_id', transaction_id).order('id')
-        ])
+        // const [transRes, itemRes] = await Promise.all([
+        //     supabase.from('transactions_oil').select('*').eq('transaction_id', transaction_id).single(),
+        //     supabase.from('transaction_items_oil').select('*').eq('transaction_id', transaction_id).order('id')
+        // ])
 
-        setTransactionData(transRes.data)
-        setTransactionItems(itemRes.data)
+        // setTransactionData(transRes.data)
+        // setTransactionItems(itemRes.data)
     }
 
     const showInRupiah = (amount) => {
@@ -63,7 +79,7 @@ const TransactionDetail = () => {
                         <p className="left_side parMar">Transaction id:</p>
                         <p className="right_side parMar">{transactionData.transaction_id}</p>
                         <p className="left_side parMar">Transaction date:</p>
-                        <p className="right_side parMar">{transactionDateHandler(transactionData.transaction_date)}</p>
+                        <p className="right_side parMar">{transactionDateHandler(new Date(transactionData.transaction_date).toISOString())}</p>
                         <p className="left_side parMar">Bonus level:</p>
                         <p className="right_side parMar">{transactionData.level}</p>
                     </div>
@@ -71,7 +87,7 @@ const TransactionDetail = () => {
                         <p style={{ fontWeight: 'bold', fontSize: '20px'}}>Transaction Items</p>
                         <div className="items_container">
                             {transactionItems.map(item => (
-                                <div className="item_container">
+                                <div className="item_container" key={item.product_id}>
                                     <img 
                                         src={productsImgData[item.product_id]}
                                         style={{width: "20px"}}
@@ -108,16 +124,17 @@ const TransactionDetail = () => {
                                 <p className="left_side parMar">Total installments:</p>
                                 <p className="right_side parMar">{transactionData.total_installments}</p>
                             </div>
-                            <button className="installment_payments_btn">View Installment Payments</button>
+                            <button className="installment_payments_btn" onClick={() => setViewPayments(transaction_id)}>View Installment Payments</button>
                         </div>
                     )}
                 </div>
                 <div className="transaction_btn">
                     <button className="edit-btn btn">Edit</button>
-                    <button className="delete-btn btn">Delete</button>
+                    {/* <NavLink className="delete-btn btn" to="/my-pages/my-transactions" onClick={deleteTransactionHandler}>Delete</NavLink> */}
                     <NavLink className="nav-link btn" to="/my-pages/my-transactions">Back</NavLink>
                 </div>
             </div>
+            {viewPayments === transaction_id && (<InstallmentPayments setViewPayments={setViewPayments} />)}
         </div>
     )
 }

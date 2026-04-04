@@ -3,8 +3,6 @@ import './TransactionForm.css'
 import { useTransactionStore } from '../contexts/useTransactionStore'
 
 function TransactionForm({ transactions, setTransactions }){
-    const transactionsData = useTransactionStore(state => state.user_id)
-    
     return (
         <div>
             <form className='transaction_form'>

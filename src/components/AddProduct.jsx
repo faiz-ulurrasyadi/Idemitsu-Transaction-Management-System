@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import './AddProduct.css'
 import { supabase } from '../services/supabase-client'
 import CurrencyInput from 'react-currency-input-field'
+import { useProductStore } from "../contexts/useProductStore"
 
 function AddProduct(){
     const [productData, setProductData] = useState({
@@ -14,10 +15,12 @@ function AddProduct(){
         dec: "",
         stock: 0,
     })
+    const { products, setProducts, addProduct, updateProduct } = useProductStore()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         const {error} = await supabase.from('products_oil').insert(productData).single()
+        addProduct(productData)
         setProductData({
             product_id: "",
             name: "",
@@ -31,8 +34,8 @@ function AddProduct(){
     }
 
     useEffect(() => {
-
-    }, [productData])
+        console.log(products)
+    }, [products])
 
     return (
         <div>

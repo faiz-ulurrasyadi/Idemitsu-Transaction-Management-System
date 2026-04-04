@@ -1,10 +1,10 @@
-import Header from "../components/Header"
+// import Header from "../components/Header"
 import { useState, useEffect } from "react"
 import { supabase } from "../services/supabase-client"
-import cart from '../assets/shopping-cart.png'
 import { productsImgData } from '../assets/productsImg'
 import './Carts.css'
 import TransactionForm from "../components/TransactionForm"
+import { useTransactionStore } from "../contexts/useTransactionStore"
 
 function Carts({ cartLists, setCartLists }) {
     const carts = []
@@ -13,7 +13,7 @@ function Carts({ cartLists, setCartLists }) {
     const [deleteId, setDeleteId] = useState(null)
     const [levelTotal, setLevelTotal] = useState(0)
     const [transItems, setTransItems] = useState([])
-    const [transactions, setTransactions] = useState({
+    const [transaction, setTransaction] = useState({
         transaction_id: '',
         user_id: '',
         transaction_date: new Date(),
@@ -31,6 +31,11 @@ function Carts({ cartLists, setCartLists }) {
         "payment": "PAY",
     }
     let nextYear = false
+    const { transactions, setTransactions, updateTransactions, addTransactions,
+        transaction_items, addTransactionsItems,
+        installment_plans, updateInstallmentPlans, addInstallmentPlans,
+        installment_payments, updateInstallmentPayments, addInstallmentPayments,
+        isFetched } = useTransactionStore()
 
     const showInRupiah = (amount) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0,
@@ -96,6 +101,12 @@ function Carts({ cartLists, setCartLists }) {
     }
     const insertToDatabase = async (data, name) => {
         const { error } = await supabase.from(name).insert(data).single()
+        if (name==="transaction_items_oil"){
+            addTransactionsItems(data)
+        }
+        if (name==="installment_payments"){
+            addInstallmentPayments(data)
+        }
 
         if (error){
             console.log(error)
@@ -112,44 +123,44 @@ function Carts({ cartLists, setCartLists }) {
             quantity: list.quantity,
             subtotal: list.price * list.quantity,
         }))
-        const tempTransaction = {...transactions,
+        const tempTransaction = {...transaction,
             transaction_id: tempTrans_id,
             total_amount: totalCart.amount,
             level: levelTotal,
         }
 
         const { error } = await supabase.from('transactions_oil').insert(tempTransaction).single()
-        setTransactions(tempTransaction)
-        console.log(tempTransItems)
+        addTransactions(tempTransaction)
+        setTransaction(tempTransaction)
         tempTransItems.forEach(item => insertToDatabase(item, 'transaction_items_oil'))
 
-        if (transactions.payment_type === "installment"){
+        if (transaction.payment_type === "installment"){
             const tempInstallmentId = generateId("installment")
             const tempInstallmentPlans = {
                 installment_id: tempInstallmentId,
                 transaction_id: tempTrans_id,
-                total_installments: transactions.total_installments,
-                installment_amount: parseInt(totalCart.amount/transactions.total_installments),
-                start_date: new Date(transactions.transaction_date),
+                total_installments: transaction.total_installments,
+                installment_amount: parseInt(totalCart.amount/transaction.total_installments),
+                start_date: new Date(transaction.transaction_date),
             }
 
             let tempInstallmentPayments = []
-            const baseAmount = Math.floor(totalCart.amount / transactions.total_installments)
-            const remainder = totalCart.amount % transactions.total_installments
-            const installments = Array.from({ length: transactions.total_installments }, (_, i) => ({
-            amount: i === transactions.total_installments - 1
+            const baseAmount = Math.floor(totalCart.amount / transaction.total_installments)
+            const remainder = totalCart.amount % transaction.total_installments
+            const installments = Array.from({ length: transaction.total_installments }, (_, i) => ({
+            amount: i === transaction.total_installments - 1
                 ? baseAmount + remainder
                 : baseAmount
             }))
 
-            for (let i=1; i<=transactions.total_installments; i++){
+            for (let i=1; i<=transaction.total_installments; i++){
                 tempInstallmentPayments.push({
                     payment_id: generateId("payment"),
                     installment_id: tempInstallmentId,
                     payment_number: i,
                     amount: installments[i-1].amount,
                     due_date: new Date(
-                        transactions.transaction_date.toISOString().replace(/(\d{4})-(\d{2})(.*)/, function(_, year, month, rest){
+                        transaction.transaction_date.toISOString().replace(/(\d{4})-(\d{2})(.*)/, function(_, year, month, rest){
                             year = nextYear? (parseInt(year)+1).toString() : year
                             month = ((parseInt(month) + i)%12).toString()
                             if (month==="0"){
@@ -166,7 +177,7 @@ function Carts({ cartLists, setCartLists }) {
                 })
             }
             const { error } = await supabase.from('installment_plans').insert(tempInstallmentPlans).single()
-            console.log(tempInstallmentPayments)
+            addInstallmentPlans(tempInstallmentPlans)
             tempInstallmentPayments.forEach(payment => insertToDatabase(payment, 'installment_payments'))
         }
     }
@@ -239,7 +250,7 @@ function Carts({ cartLists, setCartLists }) {
                 <div className="checkout-container">
                     <p>Total amount: {showInRupiah(totalCart.amount)}</p>
                     <p>Bonus level: {levelTotal}</p>
-                    <TransactionForm transactions={transactions} setTransactions={setTransactions}/>
+                    <TransactionForm transactions={transaction} setTransactions={setTransaction}/>
                     {/* {transItems.length!==0 && (
                         transItems.map(item => (
                             <div>

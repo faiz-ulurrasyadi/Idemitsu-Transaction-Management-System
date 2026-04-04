@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import CurrencyInput from 'react-currency-input-field'
 import { supabase } from '../services/supabase-client'
 import { productsImgData } from '../assets/productsImg'
-import { userCart } from '../contexts/userContext'
+import { useProductStore } from '../contexts/useProductStore'
 
 function Products({ search, getCartList }) {
     const [filter, setFilter] = useState({
@@ -13,48 +13,90 @@ function Products({ search, getCartList }) {
         minPrice: 0,
         maxPrice: 0,
     })
-    const [products, setProducts] = useState([])
+    // const [products, setProducts] = useState([])
     const [addedModalId, setAddedModalId] = useState("")
+    const { products, setProducts, addProduct, updateProduct, isFetched } = useProductStore()
+    const [filteredProducts, setFilteredProducts] = useState([])
 
     const fetchData = async () => {
-        // const { error, data } = await supabase.from('products_oil').select('*').order('id', {ascending: true})
-        
-        let query = supabase
-        .from("products_oil")
-        .select("*")
+        // let query = supabase
+        // .from("products_oil")
+        // .select("*")
 
-        if (filter.oilGrade !== 'all') {
-        query = query.eq("quality", filter.oilGrade)
-        }
-        if (filter.vecType !== 'all') {
-        query = query.eq("vec_type", filter.vecType)
-        }
-        if (filter.transmission !== 'all') {
-        query = query.eq("transmission", filter.transmission)
-        }
-        if (filter.minPrice) {
-        query = query.gte("price", filter.minPrice)
-        }
-        if (filter.maxPrice) {
-        query = query.lte("price", filter.maxPrice)
-        }
-        if (search.length!==0){
-            search.forEach(word => {
-                query = query.ilike("dec", `%${word}%`)
-            })
-        }
+        // if (filter.oilGrade !== 'all') {
+        // query = query.eq("quality", filter.oilGrade)
+        // }
+        // if (filter.vecType !== 'all') {
+        // query = query.eq("vec_type", filter.vecType)
+        // }
+        // if (filter.transmission !== 'all') {
+        // query = query.eq("transmission", filter.transmission)
+        // }
+        // if (filter.minPrice) {
+        // query = query.gte("price", filter.minPrice)
+        // }
+        // if (filter.maxPrice) {
+        // query = query.lte("price", filter.maxPrice)
+        // }
+        // if (search.length!==0){
+        //     search.forEach(word => {
+        //         query = query.ilike("dec", `%${word}%`)
+        //     })
+        // }
 
-        const { data, error } = await query
+        // const { data, error } = await query
+        // setProducts(data)
+
+        const { error, data } = await supabase.from('products_oil').select('*').order('id', {ascending: true})
         setProducts(data)
     }
     const showInRupiah = (amount) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0,
     maximumFractionDigits: 0, }).format(amount)
     }
+    const filterProducts = () => {
+        let tempFilteredProducts = products
+
+        if (filter.oilGrade !== 'all') {
+            tempFilteredProducts = tempFilteredProducts.filter(product => 
+                product.quality === filter.oilGrade)
+        }
+        if (filter.vecType !== 'all') {
+            tempFilteredProducts = tempFilteredProducts.filter(product => 
+                product.vec_type === filter.vecType)
+        }
+        if (filter.transmission !== 'all') {
+            tempFilteredProducts = tempFilteredProducts.filter(product => 
+                product.transmission === filter.transmission)
+        }
+        if (filter.minPrice) {
+            tempFilteredProducts = tempFilteredProducts.filter(product => 
+                product.price >= filter.minPrice)
+        }
+        if (filter.maxPrice) {
+            tempFilteredProducts = tempFilteredProducts.filter(product => 
+                product.price <= filter.maxPrice)
+        }
+        if (search.length!==0){
+            search.forEach(word => {
+                tempFilteredProducts = tempFilteredProducts.filter(product => 
+                    product.dec.includes(word))
+            })
+        }
+        setFilteredProducts(tempFilteredProducts)
+    }
 
     useEffect(() => {
-        fetchData()
-    }, [filter, search])
+        if (!isFetched){
+            fetchData()
+        } else {
+            if (filteredProducts.length===0){
+                setFilteredProducts(products)
+            } else {
+                filterProducts()
+            }
+        }
+    }, [filter, search, products])
 
     return (
         <div className="products-component">
@@ -162,7 +204,7 @@ function Products({ search, getCartList }) {
                 <button className="filter-btn">Apply filter</button> */}
             </div>
             <div className="products-container">
-                {products.length!==0?products.map((product, idx) => (
+                {filteredProducts.length!==0?filteredProducts.map((product, idx) => (
                     <div className="product-card" key={product.product_id}>
                         <img className="product-img" src={productsImgData[product.product_id]} />
                         <p>{product.name}</p>

@@ -28,6 +28,7 @@
 }
 
 .myPages-content{
+    position: relative;
     border: 2px solid grey;
     border-radius: 5px;
     padding: 10px;

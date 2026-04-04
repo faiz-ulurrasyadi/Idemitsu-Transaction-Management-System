@@ -2,12 +2,15 @@ import { supabase } from '../services/supabase-client'
 import { useState, useEffect } from 'react'
 import CurrencyInput from 'react-currency-input-field'
 import './ListProducts.css'
+import { useProductStore } from '../contexts/useProductStore'
 
 function ListProducts(){
-    const [products, setProducts] = useState([])
+    // const [products, setProducts] = useState([])
     const [editedProducts, setEditedProducts] = useState({})
     const [editingId, setEditingId] = useState(null)
     const [deleteId, setDeleteId] = useState(null)
+    const { products, setProducts, addProduct, 
+        updateProduct, removeProduct, isFetched } = useProductStore()
 
     const fetchData = async () => {
         const {error, data} = await supabase.from('products_oil').select('*').order('id', {ascending: true})
@@ -20,6 +23,7 @@ function ListProducts(){
     const submitEditHandle = async (e) => {
         e.preventDefault()
         const {error} = await supabase.from('products_oil').update(editedProducts).eq("product_id", editedProducts.product_id)
+        updateProduct(editedProducts)
         setEditedProducts({
             product_id: "",
             name: "",
@@ -34,14 +38,17 @@ function ListProducts(){
     }
     const deleteList = async (id) => {
         const { error } = await supabase.from("products_oil").delete().eq('product_id', id)
-        if (!error){
-            fetchData()
-        }
+        removeProduct(id)
+        // if (!error){
+        //     fetchData()
+        // }
         setDeleteId(null)
     }
 
     useEffect(() => {
-        fetchData()
+        if(!isFetched){
+            fetchData()
+        }
     }, [editedProducts, products])
 
     return (
