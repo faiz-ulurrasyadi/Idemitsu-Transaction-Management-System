@@ -5,6 +5,7 @@ import { productsImgData } from '../assets/productsImg'
 import './TransactionDetail.css'
 import { useTransactionStore } from "../contexts/useTransactionStore"
 import InstallmentPayments from "./InstallmentPayments"
+import EditTransaction from "./EditTransaction"
 
 const TransactionDetail = () => {
     const { transaction_id } = useParams()
@@ -17,6 +18,7 @@ const TransactionDetail = () => {
         "failed": "Transaction failed"
     }
     const [viewPayments, setViewPayments] = useState(null)
+    const [editId, setEditId] = useState(null)
     const [payments, setPayments] = useState([])
     const { transactions, setTransactions, updateTransactions, addTransactions, removeTransactions,
         transaction_items, addTransactionsItems,
@@ -129,11 +131,12 @@ const TransactionDetail = () => {
                     )}
                 </div>
                 <div className="transaction_btn">
-                    <button className="edit-btn btn">Edit</button>
+                    <button className="edit-btn btn" onClick={() => setEditId(transaction_id)}>Edit</button>
                     {/* <NavLink className="delete-btn btn" to="/my-pages/my-transactions" onClick={deleteTransactionHandler}>Delete</NavLink> */}
                     <NavLink className="nav-link btn" to="/my-pages/my-transactions">Back</NavLink>
                 </div>
             </div>
+            {editId === transaction_id && (<EditTransaction setEditId={setEditId} />)}
             {viewPayments === transaction_id && (<InstallmentPayments setViewPayments={setViewPayments} />)}
         </div>
     )
